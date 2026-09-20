@@ -72,8 +72,7 @@ The output APK will be generated in the `output/` directory.
 
 ---
 
-## 📦 APK Releases
+## 📦 APK Release
 
-Pre-built release APKs are located in the `output/` folder:
-- `output/indian-idle-tycoon-v1.1.0.apk`: Latest release with full Phase 2 deep gameplay systems.
-- `output/indian-idle-tycoon-v1.0.0.apk`: Default release APK.
+Pre-built release APK is located in the `output/` folder:
+- **`output/indian-idle-tycoon-v1.1.0.apk`**: Latest signed release with full Phase 2 gameplay systems.
