@@ -32,14 +32,26 @@ const Game = (function () {
     scene.fog = new THREE.Fog(0x87CEEB, 30, 80);
 
     // Camera
-    camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.5, 100);
+    const width = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 360;
+    const height = window.innerHeight || (document.documentElement && document.documentElement.clientHeight) || 640;
+    camera = new THREE.PerspectiveCamera(55, width / height, 0.5, 100);
     camera.position.set(0, 10, 15);
     camera.lookAt(0, 0, 0);
 
-    // Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Renderer with fallback
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'default' });
+    } catch (e1) {
+      console.warn('Antialiased WebGLRenderer failed, trying standard fallback:', e1);
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: false });
+      } catch (e2) {
+        throw new Error('WebGL not supported: ' + (e2 && e2.message ? e2.message : e2));
+      }
+    }
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(pixelRatio);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.getElementById('gameCanvas').appendChild(renderer.domElement);
@@ -1125,7 +1137,8 @@ const Game = (function () {
     updateLoading(5, 'Loading game...');
     setTimeout(() => init().catch(e => {
       console.error('Init failed:', e);
-      updateLoading(100, 'Error loading game. Please refresh.');
+      const errMsg = (e && (e.message || (typeof e === 'string' ? e : JSON.stringify(e)))) || 'Unknown error';
+      updateLoading(100, 'Error: ' + errMsg);
     }), 100);
   }
 
