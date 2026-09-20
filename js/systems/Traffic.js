@@ -203,6 +203,46 @@ class TrafficSystem {
       const lane = this.lanes[vehicle.userData.laneIdx];
       const uData = vehicle.userData;
 
+      // Anti-collision: check distance to vehicle ahead in the same lane
+      let frontDist = Infinity;
+      let frontSpeed = uData.baseSpeed;
+      for (let j = 0; j < this.vehicles.length; j++) {
+        if (i === j) continue;
+        const other = this.vehicles[j];
+        if (other.userData.laneIdx !== uData.laneIdx) continue;
+
+        let distAhead;
+        if (lane.direction < 0) {
+          // Moving West (-X direction)
+          distAhead = vehicle.position.x - other.position.x;
+        } else {
+          // Moving East (+X direction)
+          distAhead = other.position.x - vehicle.position.x;
+        }
+
+        if (distAhead > 0 && distAhead < frontDist) {
+          frontDist = distAhead;
+          frontSpeed = other.userData.speed;
+        }
+      }
+
+      // Smooth deceleration / braking to prevent clipping into leader
+      if (frontDist < 1.6) {
+        // Emergency stop / crawl to keep distance
+        uData.speed = Math.max(0, uData.speed - deltaTime * 4.0);
+      } else if (frontDist < 2.8) {
+        // Brake to match or drop below front vehicle's speed
+        const targetSpeed = Math.max(0.4, Math.min(uData.baseSpeed, frontSpeed * 0.8));
+        uData.speed += (targetSpeed - uData.speed) * Math.min(1, deltaTime * 3.0);
+      } else if (frontDist < 4.2) {
+        // Match front vehicle speed
+        const targetSpeed = Math.min(uData.baseSpeed, frontSpeed);
+        uData.speed += (targetSpeed - uData.speed) * Math.min(1, deltaTime * 2.0);
+      } else {
+        // Road is clear - smoothly accelerate back to base speed
+        uData.speed += (uData.baseSpeed - uData.speed) * Math.min(1, deltaTime * 1.5);
+      }
+
       // Advance along lane
       vehicle.position.x += lane.direction * uData.speed * deltaTime;
 

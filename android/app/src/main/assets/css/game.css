@@ -203,3 +203,50 @@ html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; fo
   .hud-block { padding: 8px 16px; }
   .hud-value { font-size: 1.3em; }
 }
+
+/* Starter Guide Banner & Pulse */
+.starter-banner {
+  position: fixed;
+  top: 66px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(230, 81, 0, 0.95), rgba(255, 152, 0, 0.95));
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 152, 0, 0.6);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  max-width: 90vw;
+  box-sizing: border-box;
+  animation: pulseGuide 2.2s infinite ease-in-out;
+}
+.starter-banner.hidden { display: none !important; }
+.banner-icon { font-size: 1.4em; }
+.banner-text { flex: 1; line-height: 1.3; }
+.banner-close {
+  background: rgba(0,0,0,0.25);
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+}
+@keyframes pulseGuide {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.03); }
+}
+.pulse-nav {
+  animation: pulseNavBtn 1.5s infinite;
+  box-shadow: 0 0 12px #FFD700 !important;
+  border-color: #FFD700 !important;
+}
+@keyframes pulseNavBtn {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}

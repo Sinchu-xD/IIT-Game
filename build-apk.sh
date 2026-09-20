@@ -115,16 +115,17 @@ echo "[4/5] Locating APK..."
 APK=$(find "$ANDROID" -name "*.apk" -path "*/build/outputs/apk/*" 2>/dev/null | head -1)
 if [ -n "$APK" ]; then
     mkdir -p "$OUTPUT"
-    cp "$APK" "$OUTPUT/indian-idle-tycoon-v1.1.0.apk"
-    /home/ubuntu/android-sdk/build-tools/34.0.0/apksigner sign --ks "$ANDROID/debug.keystore" --ks-pass pass:android --ks-key-alias androiddebugkey --key-pass pass:android --v4-signing-enabled true "$OUTPUT/indian-idle-tycoon-v1.1.0.apk" 2>/dev/null || true
-    SIZE=$(du -h "$OUTPUT/indian-idle-tycoon-v1.1.0.apk" | cut -f1)
+    rm -f "$OUTPUT"/*.apk "$OUTPUT"/*.idsig
+    cp "$APK" "$OUTPUT/indian-idle-tycoon-v1.2.0.apk"
+    /home/ubuntu/android-sdk/build-tools/34.0.0/apksigner sign --ks "$ANDROID/debug.keystore" --ks-pass pass:android --ks-key-alias androiddebugkey --key-pass pass:android --v4-signing-enabled true "$OUTPUT/indian-idle-tycoon-v1.2.0.apk" 2>/dev/null || true
+    SIZE=$(du -h "$OUTPUT/indian-idle-tycoon-v1.2.0.apk" | cut -f1)
     echo ""
     echo "========================================"
     echo "  ✅ APK BUILD SUCCESSFUL!"
     echo "========================================"
-    echo "  Path: $OUTPUT/indian-idle-tycoon-v1.1.0.apk"
+    echo "  Path: $OUTPUT/indian-idle-tycoon-v1.2.0.apk"
     echo "  Size: $SIZE"
-    echo "  Version: 1.1.0"
+    echo "  Version: 1.2.0"
     echo "========================================"
 else
     echo ""

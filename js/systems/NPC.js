@@ -227,13 +227,26 @@ class NPCSystem {
       if (npc.userData.state === 'walking') {
         const target = this.plotPositions[npc.userData.targetPlot];
         if (target) {
-          const dx = target.x - npc.position.x;
-          const dz = target.z - npc.position.z;
+          // Calculate queue position so multiple customers do not overlap
+          let queueIndex = 0;
+          for (let c = 0; c < this.customers.length; c++) {
+            if (this.customers[c] === npc) break;
+            if (this.customers[c].userData.targetPlot === npc.userData.targetPlot) {
+              queueIndex++;
+            }
+          }
+          const slotX = (queueIndex % 2 === 1 ? -0.45 : (queueIndex > 0 ? 0.45 : 0));
+          const slotZ = 1.1 + Math.floor(queueIndex / 2) * 0.45;
+          const targetX = target.x + slotX;
+          const targetZ = target.z + slotZ;
+
+          const dx = targetX - npc.position.x;
+          const dz = targetZ - npc.position.z;
           const dist = Math.sqrt(dx * dx + dz * dz);
-          if (dist > 0.5) {
+          if (dist > 0.35) {
             npc.position.x += (dx / dist) * npc.userData.speed * deltaTime;
             npc.position.z += (dz / dist) * npc.userData.speed * deltaTime;
-            npc.lookAt(target.x, npc.position.y, target.z);
+            npc.lookAt(targetX, npc.position.y, targetZ);
 
             // Walking swing
             npc.userData.animTimer += deltaTime * npc.userData.speed;
@@ -244,6 +257,8 @@ class NPCSystem {
             if (npc.userData.armR) npc.userData.armR.rotation.x = swing;
           } else {
             npc.userData.state = 'shopping';
+            // Face the shop counter
+            npc.lookAt(target.x, npc.position.y, target.z);
             // Service speed modifier from specializations and roles
             let speedMod = 1.0;
             if (this.gs?.progression) {
@@ -275,8 +290,17 @@ class NPCSystem {
           if (npc.userData.armR) npc.userData.armR.rotation.x = 0;
         }
       } else if (npc.userData.state === 'leaving') {
-        const dir = npc.position.x > 0 ? -1 : 1;
-        npc.position.x += dir * npc.userData.speed * deltaTime;
+        // Natural exit path: walk to nearest sidewalk then leave
+        const exitZ = npc.position.z >= 0 ? 7.2 : -7.2;
+        const dz = exitZ - npc.position.z;
+        if (Math.abs(dz) > 0.35) {
+          npc.position.z += Math.sign(dz) * npc.userData.speed * deltaTime;
+          npc.rotation.y = dz > 0 ? 0 : Math.PI;
+        } else {
+          const dir = npc.position.x >= 0 ? 1 : -1;
+          npc.position.x += dir * npc.userData.speed * deltaTime;
+          npc.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+        }
 
         // Walking swing
         npc.userData.animTimer += deltaTime * npc.userData.speed;
@@ -294,13 +318,15 @@ class NPCSystem {
       }
     }
 
-    // Update pedestrians
+    // Update pedestrians with sidewalk lane separation
     for (let i = this.pedestrians.length - 1; i >= 0; i--) {
       const npc = this.pedestrians[i];
       const path = this.paths[npc.userData.pathIdx];
       const wp = path[npc.userData.waypointIdx];
+      const laneOffset = (npc.userData.direction > 0 ? 0.28 : -0.28);
+      const targetZ = (npc.userData.pathIdx < 2) ? (wp.z + laneOffset) : wp.z;
       const dx = wp.x - npc.position.x;
-      const dz = wp.z - npc.position.z;
+      const dz = targetZ - npc.position.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
 
       if (dist < 0.3) {
@@ -310,8 +336,8 @@ class NPCSystem {
           npc.userData.waypointIdx = Math.max(0, Math.min(path.length - 1, npc.userData.waypointIdx));
         }
       } else {
-        npc.position.x += (dx / dist) * npc.userData.speed * deltaTime * 0.3;
-        npc.position.z += (dz / dist) * npc.userData.speed * deltaTime * 0.3;
+        npc.position.x += (dx / dist) * npc.userData.speed * deltaTime * 0.35;
+        npc.position.z += (dz / dist) * npc.userData.speed * deltaTime * 0.35;
         if (Math.abs(dx) > Math.abs(dz)) {
           npc.rotation.y = dx > 0 ? Math.PI / 2 : -Math.PI / 2;
         } else {
@@ -325,6 +351,38 @@ class NPCSystem {
         if (npc.userData.legR) npc.userData.legR.rotation.x = -swing;
         if (npc.userData.armL) npc.userData.armL.rotation.x = -swing;
         if (npc.userData.armR) npc.userData.armR.rotation.x = swing;
+      }
+    }
+
+    // Soft physics crowd separation: prevent NPCs from clipping/walking into each other
+    this.handleCrowdSeparation(deltaTime);
+  }
+
+  handleCrowdSeparation(deltaTime) {
+    const all = [...this.customers, ...this.pedestrians];
+    const minDist = 0.52;
+    const minDistSq = minDist * minDist;
+
+    for (let i = 0; i < all.length; i++) {
+      const a = all[i];
+      for (let j = i + 1; j < all.length; j++) {
+        const b = all[j];
+        const dx = a.position.x - b.position.x;
+        const dz = a.position.z - b.position.z;
+        const distSq = dx * dx + dz * dz;
+
+        if (distSq < minDistSq && distSq > 0.0001) {
+          const dist = Math.sqrt(distSq);
+          const push = (minDist - dist) * 0.5;
+          const nx = dx / dist;
+          const nz = dz / dist;
+          const pushAmount = Math.min(push, deltaTime * 2.5);
+
+          a.position.x += nx * pushAmount;
+          a.position.z += nz * pushAmount;
+          b.position.x -= nx * pushAmount;
+          b.position.z -= nz * pushAmount;
+        }
       }
     }
   }

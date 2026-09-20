@@ -240,6 +240,7 @@ const Game = (function () {
     // Hide loading screen
     setTimeout(() => {
       document.getElementById('loadingScreen').classList.add('hidden');
+      checkStarterGuide();
     }, 500);
 
     updateHUD();
@@ -467,8 +468,18 @@ const Game = (function () {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
 
-    // Collect candidate targets (plots and building meshes; moving traffic/NPCs are never included)
+    // Collect candidate targets (plots, floating badges, barriers, and building meshes)
     const targets = [...(buildingSystem.plotMeshes || [])];
+    if (buildingSystem.emptyPlotBadges) {
+      buildingSystem.emptyPlotBadges.forEach(b => {
+        if (b && b.visible) b.traverse(c => { if (c.isMesh) targets.push(c); });
+      });
+    }
+    if (buildingSystem.lockedBarriers) {
+      buildingSystem.lockedBarriers.forEach(b => {
+        if (b && b.visible) b.traverse(c => { if (c.isMesh) targets.push(c); });
+      });
+    }
     if (buildingSystem.buildingMeshes) {
       for (const k in buildingSystem.buildingMeshes) {
         const entry = buildingSystem.buildingMeshes[k];
@@ -566,19 +577,32 @@ const Game = (function () {
         <div class="cost">${economy.formatCash(cost)}</div>
       `;
       item.addEventListener('click', () => {
-        if (selectedPlotIdx === null) {
-          showToast('Tap a plot first!');
+        let plotToBuild = selectedPlotIdx;
+        if (plotToBuild === null) {
+          // Auto-select first available empty unlocked plot
+          for (let p = 0; p < gameState.unlockedPlots; p++) {
+            if (!buildingSystem.getBuildingAtPlot(p)) {
+              plotToBuild = p;
+              selectedPlotIdx = p;
+              buildingSystem.selectPlot(p);
+              break;
+            }
+          }
+        }
+        if (plotToBuild === null) {
+          showToast(`All unlocked plots are occupied! Unlock Plot ${gameState.unlockedPlots + 1} first.`);
           return;
         }
-        if (buildingSystem.build(bid, selectedPlotIdx)) {
+        if (buildingSystem.build(bid, plotToBuild)) {
           playSound('build');
-          particles.spawnBuildEffect(buildingSystem.plotPositions[selectedPlotIdx]);
+          particles.spawnBuildEffect(buildingSystem.plotPositions[plotToBuild]);
           hideAllPanels();
           updateHUD();
-          showToast(`${cfg.name} under construction...`);
+          showToast(`🎉 ${cfg.name} built! Tap it to earn quick cash!`, 3000);
+          hideStarterGuide();
         } else {
           playSound('error');
-          showToast('Not enough cash!');
+          showToast(`Not enough cash! Need ${economy.formatCash(cost)}`);
         }
       });
       grid.appendChild(item);
@@ -1131,6 +1155,27 @@ const Game = (function () {
     }
   };
 
+  // ─── Starter Guide ───
+  function checkStarterGuide() {
+    const banner = document.getElementById('starterBanner');
+    const navBuild = document.getElementById('navBuild');
+    const count = buildingSystem ? buildingSystem.countTotalBuildings() : 0;
+    if (count === 0) {
+      if (banner) banner.classList.remove('hidden');
+      if (navBuild) navBuild.classList.add('pulse-nav');
+    } else {
+      if (banner) banner.classList.add('hidden');
+      if (navBuild) navBuild.classList.remove('pulse-nav');
+    }
+  }
+
+  function hideStarterGuide() {
+    const banner = document.getElementById('starterBanner');
+    const navBuild = document.getElementById('navBuild');
+    if (banner) banner.classList.add('hidden');
+    if (navBuild) navBuild.classList.remove('pulse-nav');
+  }
+
   // ─── Boot ───
   function boot() {
     // Preload
@@ -1151,7 +1196,8 @@ const Game = (function () {
     claimDailyReward,
     switchMissionTab,
     playSound,
-    checkBusinessUnlocks
+    checkBusinessUnlocks,
+    hideStarterGuide
   };
 })();
 

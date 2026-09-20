@@ -13,6 +13,8 @@ class BuildingSystem {
     this.selectionIndicator = null;
     this.tapCooldown = 1200;
     this.progression = null;
+    this.emptyPlotBadges = [];
+    this.lockedBarriers = [];
   }
 
   setProgressionSystem(progression) {
@@ -109,13 +111,17 @@ class BuildingSystem {
   createPlotMarkers() {
     this.initPlotPositions();
     this.createSelectionIndicator();
+    this.emptyPlotBadges = [];
+    this.lockedBarriers = [];
+
     const geo = new THREE.BoxGeometry(2.2, 0.15, 2.2);
     for (let i = 0; i < this.plotPositions.length; i++) {
       const pos = this.plotPositions[i];
+      const isUnlocked = i < this.gs.unlockedPlots;
       const mat = new THREE.MeshLambertMaterial({
-        color: i < this.gs.unlockedPlots ? 0x44AA44 : 0x884444,
+        color: isUnlocked ? 0x44AA44 : 0x7E3838,
         transparent: true,
-        opacity: 0.7
+        opacity: 0.75
       });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(pos.x, 0.08, pos.z);
@@ -128,7 +134,59 @@ class BuildingSystem {
       const labelMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
       const label = new THREE.Mesh(labelGeo, labelMat);
       label.position.set(pos.x, 0.2, pos.z);
+      label.userData = { plotIndex: i, isPlot: true };
       this.scene.add(label);
+
+      // ─── Floating 3D "TAP TO BUILD" Badge for Unlocked Empty Plots ───
+      const badgeGroup = new THREE.Group();
+      badgeGroup.position.set(pos.x, 1.2, pos.z);
+
+      const discGeo = new THREE.CylinderGeometry(0.48, 0.48, 0.08, 16);
+      const discMat = new THREE.MeshLambertMaterial({ color: 0xFFD700, emissive: 0x553300 });
+      const disc = new THREE.Mesh(discGeo, discMat);
+      disc.rotation.x = Math.PI / 4;
+      disc.userData = { plotIndex: i, isPlot: true };
+      badgeGroup.add(disc);
+
+      const iconGeo = new THREE.BoxGeometry(0.12, 0.4, 0.12);
+      const iconMat = new THREE.MeshLambertMaterial({ color: 0xE65100 });
+      const icon = new THREE.Mesh(iconGeo, iconMat);
+      icon.position.set(0, 0.08, 0.04);
+      icon.userData = { plotIndex: i, isPlot: true };
+      badgeGroup.add(icon);
+
+      badgeGroup.userData = { plotIndex: i, isPlotBadge: true };
+      badgeGroup.visible = isUnlocked && !this.getBuildingAtPlot(i);
+      this.scene.add(badgeGroup);
+      this.emptyPlotBadges.push(badgeGroup);
+
+      // ─── Locked Barrier for Future Expansion Plots ───
+      const barrierGroup = new THREE.Group();
+      barrierGroup.position.set(pos.x, 0.25, pos.z);
+
+      const postGeo = new THREE.BoxGeometry(0.1, 0.4, 0.1);
+      const woodMat = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+      const postL = new THREE.Mesh(postGeo, woodMat);
+      postL.position.set(-0.8, 0, 0);
+      postL.userData = { plotIndex: i, isPlot: true };
+      barrierGroup.add(postL);
+
+      const postR = new THREE.Mesh(postGeo, woodMat);
+      postR.position.set(0.8, 0, 0);
+      postR.userData = { plotIndex: i, isPlot: true };
+      barrierGroup.add(postR);
+
+      const beamGeo = new THREE.BoxGeometry(1.8, 0.12, 0.06);
+      const beamMat = new THREE.MeshLambertMaterial({ color: 0xD32F2F });
+      const beam = new THREE.Mesh(beamGeo, beamMat);
+      beam.position.set(0, 0.12, 0);
+      beam.userData = { plotIndex: i, isPlot: true };
+      barrierGroup.add(beam);
+
+      barrierGroup.userData = { plotIndex: i, isBarrier: true };
+      barrierGroup.visible = !isUnlocked;
+      this.scene.add(barrierGroup);
+      this.lockedBarriers.push(barrierGroup);
     }
   }
 
@@ -433,6 +491,10 @@ class BuildingSystem {
     this.gs.buildings[businessId].push(building);
     this.gs.totalBuildings = this.countTotalBuildings();
 
+    if (this.emptyPlotBadges && this.emptyPlotBadges[plotIndex]) {
+      this.emptyPlotBadges[plotIndex].visible = false;
+    }
+
     // Construction animation
     setTimeout(() => {
       building.state = 'built';
@@ -447,10 +509,12 @@ class BuildingSystem {
   }
 
   upgrade(businessId, plotIndex) {
+    const cfg = getBusinessConfig(businessId);
+    if (!cfg) return false;
+
     const buildings = this.gs.buildings[businessId];
     const b = buildings?.find(x => x.plotIndex === plotIndex);
-    if (!b) return false;
-    if (b.level >= getBusinessConfig(businessId).maxLevel) return false;
+    if (!b || b.level >= cfg.maxLevel) return false;
 
     const cost = getUpgradeCost(businessId, b.level);
     if (!this.economy.spendCash(cost)) return false;
@@ -458,10 +522,10 @@ class BuildingSystem {
     b.level++;
     b.state = 'upgrading';
     this.gs.upgradeActionCount = (this.gs.upgradeActionCount || 0) + 1;
-    this.upgradeBuildingVisual(businessId, plotIndex, b.level);
 
     setTimeout(() => {
       b.state = 'built';
+      this.upgradeBuildingVisual(businessId, plotIndex, b.level);
       this.economy.recalcIncome(this.gs.buildings);
       if (this.onBuildingUpdate) this.onBuildingUpdate();
     }, 500);
@@ -470,10 +534,12 @@ class BuildingSystem {
   }
 
   hireEmployee(businessId, plotIndex) {
+    const cfg = getBusinessConfig(businessId);
+    if (!cfg) return false;
+
     const buildings = this.gs.buildings[businessId];
     const b = buildings?.find(x => x.plotIndex === plotIndex);
     if (!b) return false;
-    const cfg = getBusinessConfig(businessId);
     if (b.employees >= cfg.maxEmployees) return false;
 
     const cost = cfg.employeeCost * (b.employees + 1);
@@ -487,9 +553,30 @@ class BuildingSystem {
 
   updatePlotMarker(plotIndex) {
     if (this.plotMeshes[plotIndex]) {
+      const isUnlocked = plotIndex < this.gs.unlockedPlots;
       this.plotMeshes[plotIndex].material.color.setHex(
-        plotIndex < this.gs.unlockedPlots ? 0x44AA44 : 0x884444
+        isUnlocked ? 0x44AA44 : 0x7E3838
       );
+      const isBuilt = !!this.getBuildingAtPlot(plotIndex);
+      if (this.emptyPlotBadges && this.emptyPlotBadges[plotIndex]) {
+        this.emptyPlotBadges[plotIndex].visible = isUnlocked && !isBuilt;
+      }
+      if (this.lockedBarriers && this.lockedBarriers[plotIndex]) {
+        this.lockedBarriers[plotIndex].visible = !isUnlocked;
+      }
+    }
+  }
+
+  update(deltaTime) {
+    if (this.emptyPlotBadges) {
+      const time = performance.now() * 0.003;
+      for (let i = 0; i < this.emptyPlotBadges.length; i++) {
+        const badge = this.emptyPlotBadges[i];
+        if (badge && badge.visible) {
+          badge.position.y = 1.2 + Math.sin(time + i * 0.8) * 0.12;
+          badge.rotation.y += deltaTime * 1.5;
+        }
+      }
     }
   }
 
