@@ -1,0 +1,14 @@
+{
+  "appId": "com.indianidle.tycoon",
+  "appName": "Indian Idle Tycoon",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "buildOptions": {
+      "minSdkVersion": 22,
+      "targetSdkVersion": 34
+    }
+  }
+}

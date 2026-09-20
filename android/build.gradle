@@ -1,0 +1,23 @@
+buildscript {
+    ext {
+        build_build_tools = "34.0.0"
+        compile_sdk_version = 34
+        min_sdk_version = 22
+        target_sdk_version = 34
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.2'
+    }
+}
+
+allprojects {
+    // Repositories defined in settings.gradle only
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

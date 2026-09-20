@@ -1,0 +1,205 @@
+/* Indian Idle City Tycoon - Styles */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; color: #fff; }
+#gameCanvas { display: block; width: 100%; height: 100%; }
+
+/* Loading screen */
+#loadingScreen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 1000; transition: opacity 0.5s;
+}
+#loadingScreen.hidden { opacity: 0; pointer-events: none; }
+#loadingScreen h1 { font-size: 2.5em; margin-bottom: 10px; color: #FFD700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+#loadingScreen p { color: #aaa; font-size: 1.1em; }
+#loadingBar { width: 200px; height: 8px; background: #333; border-radius: 4px; margin-top: 20px; overflow: hidden; }
+#loadingFill { width: 0%; height: 100%; background: linear-gradient(90deg, #FFD700, #FF8C00); transition: width 0.3s; border-radius: 4px; }
+
+/* Top HUD */
+#topHUD {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; pointer-events: none; z-index: 100;
+}
+.hud-block {
+  background: rgba(0,0,0,0.6); border-radius: 8px; padding: 6px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1);
+}
+.hud-label { font-size: 0.65em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.hud-value { font-size: 1.1em; font-weight: bold; color: #FFD700; }
+.hud-value.income { color: #4CAF50; }
+
+/* Bottom navigation */
+#bottomNav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 4px; padding-bottom: max(8px, env(safe-area-inset-bottom));
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255,255,255,0.1); z-index: 100;
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 6px 2px; color: #888; font-size: 0.65em;
+  background: none; border: none; cursor: pointer; transition: all 0.2s;
+  max-width: 80px;
+}
+.nav-btn .icon { font-size: 1.6em; margin-bottom: 2px; }
+.nav-btn.active { color: #FFD700; }
+.nav-btn:active { transform: scale(0.9); }
+
+/* Panels */
+.panel {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10,10,20,0.95); z-index: 200;
+  display: none; flex-direction: column;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.panel.active { display: flex; }
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+  background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.panel-header h2 { font-size: 1.2em; color: #FFD700; }
+.panel-close {
+  background: none; border: none; color: #fff; font-size: 1.5em;
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: rgba(255,255,255,0.1);
+}
+.panel-close:active { background: rgba(255,255,255,0.2); }
+
+/* Build menu */
+.build-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 12px;
+}
+.build-item {
+  background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px;
+  border: 2px solid rgba(255,255,255,0.08); cursor: pointer;
+  transition: all 0.2s;
+}
+.build-item:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+.build-item.locked { opacity: 0.4; }
+.build-item .emoji { font-size: 2em; margin-bottom: 6px; }
+.build-item .name { font-size: 0.9em; font-weight: bold; color: #fff; }
+.build-item .cost { font-size: 0.75em; color: #FFD700; margin-top: 4px; }
+.build-item .desc { font-size: 0.65em; color: #aaa; margin-top: 2px; }
+
+/* Building info panel */
+.building-info {
+  padding: 16px; max-width: 400px; margin: 0 auto; width: 100%;
+}
+.building-header { text-align: center; margin-bottom: 16px; }
+.building-header .emoji { font-size: 3em; }
+.building-header .name { font-size: 1.3em; color: #FFD700; margin-top: 4px; }
+.building-header .level { font-size: 0.9em; color: #aaa; }
+.stat-row {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.stat-label { color: #aaa; font-size: 0.85em; }
+.stat-value { color: #fff; font-weight: bold; font-size: 0.85em; }
+.progress-bar {
+  width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;
+  overflow: hidden; margin-top: 4px;
+}
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); border-radius: 4px; transition: width 0.3s; }
+.action-btn {
+  width: 100%; padding: 14px; border: none; border-radius: 10px;
+  font-size: 1em; font-weight: bold; cursor: pointer; margin-top: 10px;
+  transition: all 0.2s;
+}
+.action-btn:active { transform: scale(0.97); }
+.action-btn.primary { background: linear-gradient(135deg, #FFD700, #FF8C00); color: #000; }
+.action-btn.secondary { background: linear-gradient(135deg, #4CAF50, #45a049); color: #fff; }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Missions panel */
+.mission-item {
+  display: flex; align-items: center; padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.mission-item .mission-emoji { font-size: 1.8em; margin-right: 12px; }
+.mission-item .mission-info { flex: 1; }
+.mission-item .mission-title { font-size: 0.9em; font-weight: bold; color: #fff; }
+.mission-item .mission-desc { font-size: 0.75em; color: #aaa; margin-top: 2px; }
+.mission-item .mission-progress { margin-top: 4px; }
+.mission-item.completed { opacity: 0.5; }
+.mission-item.completed .mission-title { text-decoration: line-through; }
+
+/* Welcome back popup */
+.popup-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); z-index: 500;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.popup-overlay.active { display: flex; }
+.popup {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 16px; padding: 24px; max-width: 360px; width: 100%;
+  border: 1px solid rgba(255,215,0,0.3);
+  animation: popIn 0.3s ease-out;
+}
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.popup h2 { text-align: center; color: #FFD700; margin-bottom: 4px; }
+.popup .subtitle { text-align: center; color: #aaa; font-size: 0.85em; margin-bottom: 16px; }
+.earnings-row {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.earnings-row .biz-name { color: #ccc; font-size: 0.9em; }
+.earnings-row .biz-amount { color: #4CAF50; font-weight: bold; }
+.earnings-total {
+  display: flex; justify-content: space-between; padding: 12px 0;
+  font-size: 1.1em; font-weight: bold; color: #FFD700;
+  border-top: 2px solid rgba(255,215,0,0.3); margin-top: 8px;
+}
+
+/* Daily reward popup */
+.reward-item {
+  text-align: center; padding: 16px;
+  background: rgba(255,215,0,0.1); border-radius: 12px;
+  margin: 8px 0; border: 1px solid rgba(255,215,0,0.2);
+}
+.reward-item .reward-emoji { font-size: 2.5em; }
+.reward-item .reward-amount { color: #FFD700; font-size: 1.2em; font-weight: bold; margin-top: 4px; }
+.reward-item .reward-label { color: #aaa; font-size: 0.8em; }
+
+/* Toast notification */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+  border-radius: 20px; font-size: 0.85em; z-index: 300;
+  animation: fadeInUp 0.3s ease-out;
+  pointer-events: none; white-space: nowrap;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Scrollbar */
+.panel::-webkit-scrollbar { width: 4px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+/* Unlock notification */
+.unlock-banner {
+  background: linear-gradient(90deg, #FFD700, #FF8C00);
+  color: #000; padding: 8px 16px; border-radius: 8px;
+  font-weight: bold; text-align: center; margin: 8px 12px;
+}
+
+/* Responsive */
+@media (min-width: 600px) {
+  .build-grid { grid-template-columns: repeat(3, 1fr); }
+  #topHUD { padding: 12px 24px; }
+  .hud-block { padding: 8px 16px; }
+  .hud-value { font-size: 1.3em; }
+}

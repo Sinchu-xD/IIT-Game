@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Indian Idle Tycoon</title>
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loadingScreen">
+  <h1>🇮🇳</h1>
+  <h1 style="font-size:1.8em;margin-top:-10px;">Indian Idle Tycoon</h1>
+  <p id="loadingText">Loading...</p>
+  <div id="loadingBar"><div id="loadingFill"></div></div>
+</div>
+
+<!-- Game Canvas -->
+<div id="gameCanvas"></div>
+
+<!-- FPS Counter (debug) -->
+<div id="fpsCounter" style="position:fixed;top:4px;left:4px;color:#0f0;font-size:10px;z-index:999;opacity:0.6;font-family:monospace;">-- FPS</div>
+
+<!-- Top HUD -->
+<div id="topHUD">
+  <div class="hud-block">
+    <div class="hud-label">Cash</div>
+    <div class="hud-value" id="cashDisplay">₹0</div>
+  </div>
+  <div class="hud-block">
+    <div class="hud-label">Income</div>
+    <div class="hud-value income" id="incomeDisplay">₹0/sec</div>
+  </div>
+  <div class="hud-block">
+    <div class="hud-label">Level</div>
+    <div class="hud-value" id="levelDisplay">Lv.1</div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div id="bottomNav">
+  <button class="nav-btn" id="navBuild" onclick="Game.showPanel('buildPanel')">
+    <span class="icon">🏗️</span>
+    <span>Build</span>
+  </button>
+  <button class="nav-btn" id="navBusinesses" onclick="Game.showPanel('businessesPanel')">
+    <span class="icon">🏪</span>
+    <span>Shops</span>
+  </button>
+  <button class="nav-btn" id="navUpgrade" onclick="Game.showPanel('upgradePanel')">
+    <span class="icon">⬆️</span>
+    <span>Upgrade</span>
+  </button>
+  <button class="nav-btn" id="navCity" onclick="Game.showPanel('cityPanel')">
+    <span class="icon">🏙️</span>
+    <span>City</span>
+  </button>
+  <button class="nav-btn" id="navMissions" onclick="Game.showPanel('missionsPanel')">
+    <span class="icon">🎯</span>
+    <span>Missions</span>
+  </button>
+</div>
+
+<!-- ─── BUILD PANEL ─── -->
+<div class="panel" id="buildPanel">
+  <div class="panel-header">
+    <h2>🏗️ Build Business</h2>
+    <button class="panel-close" onclick="Game.hideAllPanels()">&times;</button>
+  </div>
+  <p style="padding:8px 16px;color:#aaa;font-size:0.8em;">Tap a green plot on the map, then choose a business.</p>
+  <div class="build-grid" id="buildGrid"></div>
+</div>
+
+<!-- ─── BUSINESSES PANEL ─── -->
+<div class="panel" id="businessesPanel">
+  <div class="panel-header">
+    <h2>🏪 My Businesses</h2>
+    <button class="panel-close" onclick="Game.hideAllPanels()">&times;</button>
+  </div>
+  <div id="businessesList"></div>
+</div>
+
+<!-- ─── UPGRADE PANEL ─── -->
+<div class="panel" id="upgradePanel">
+  <div class="panel-header">
+    <h2>⬆️ Upgrades</h2>
+    <button class="panel-close" onclick="Game.hideAllPanels()">&times;</button>
+  </div>
+  <div id="upgradeList"></div>
+</div>
+
+<!-- ─── CITY PANEL ─── -->
+<div class="panel" id="cityPanel">
+  <div class="panel-header">
+    <h2>🏙️ City Overview</h2>
+    <button class="panel-close" onclick="Game.hideAllPanels()">&times;</button>
+  </div>
+  <div id="cityInfo"></div>
+</div>
+
+<!-- ─── MISSIONS PANEL ─── -->
+<div class="panel" id="missionsPanel">
+  <div class="panel-header">
+    <h2>🎯 Objectives & Missions</h2>
+    <button class="panel-close" onclick="Game.hideAllPanels()">&times;</button>
+  </div>
+  <div style="padding:12px 16px 4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="color:#FFD700;font-weight:bold;">📅 7-Day Rewards</span>
+      <button class="action-btn primary" style="width:auto;padding:8px 16px;font-size:0.85em;" id="claimDailyBtn" onclick="Game.claimDailyReward()">Claim</button>
+    </div>
+    <div id="dailyRewardContent" style="margin-bottom:12px;"></div>
+  </div>
+
+  <!-- Tab Toggle -->
+  <div style="display:flex;gap:8px;padding:0 16px 8px;border-bottom:1px solid rgba(255,255,255,0.1);">
+    <button class="action-btn secondary" style="flex:1;padding:6px 8px;font-size:0.8em;" id="tabMissionsBtn" onclick="Game.switchMissionTab('missions')">Missions</button>
+    <button class="action-btn secondary" style="flex:1;padding:6px 8px;font-size:0.8em;" id="tabObjectivesBtn" onclick="Game.switchMissionTab('objectives')">Daily Tasks</button>
+    <button class="action-btn secondary" style="flex:1;padding:6px 8px;font-size:0.8em;" id="tabAchievementsBtn" onclick="Game.switchMissionTab('achievements')">Trophies</button>
+  </div>
+
+  <div id="missionsList"></div>
+  <div id="objectivesList" style="display:none;"></div>
+  <div id="achievementsList" style="display:none;"></div>
+</div>
+
+<!-- ─── BUILDING INFO PANEL ─── -->
+<div class="panel" id="buildingInfoPanel">
+  <div class="panel-header">
+    <h2>Building Info</h2>
+    <button class="panel-close" onclick="Game.hideAllPanels()">&times;</button>
+  </div>
+  <div class="building-info">
+    <div class="building-header">
+      <div class="emoji" id="infoEmoji">☕</div>
+      <div class="name" id="infoName">Chai Stall</div>
+      <div class="level" id="infoLevel">Level 1</div>
+      <div style="margin-top:8px;color:#FFD700;font-size:1.2em;font-weight:bold;" id="infoIncome">₹8/sec</div>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Customers</span>
+      <span class="stat-value" id="infoCustomers">1/3</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="custProgress" style="width:33%"></div></div>
+
+    <div class="stat-row" style="margin-top:8px;">
+      <span class="stat-label">Customer Demand</span>
+      <span class="stat-value" id="infoDemand" style="color:#4CAF50;">50/100</span>
+    </div>
+
+    <div class="stat-row" style="margin-top:4px;">
+      <span class="stat-label">Popularity</span>
+      <span class="stat-value" id="infoPopularity" style="color:#4CAF50;">50/100</span>
+    </div>
+
+    <!-- Specialization Section -->
+    <div id="infoSpecSection" style="margin-top:10px;padding:8px;background:rgba(255,255,255,0.05);border-radius:6px;">
+      <div style="font-size:0.85em;color:#FFD700;font-weight:bold;margin-bottom:4px;">Specialization</div>
+      <div id="infoCurrentSpec" style="font-size:0.8em;color:#fff;margin-bottom:6px;">None</div>
+      <div id="infoSpecOptions" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- Employee Role Section -->
+    <div id="infoRoleSection" style="margin-top:10px;padding:8px;background:rgba(255,255,255,0.05);border-radius:6px;">
+      <div style="font-size:0.85em;color:#FFD700;font-weight:bold;margin-bottom:4px;">Employee Role</div>
+      <div id="infoCurrentRole" style="font-size:0.8em;color:#fff;margin-bottom:6px;">None Assigned</div>
+      <div id="infoRoleOptions" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+    </div>
+
+    <button class="action-btn primary" style="margin-top:12px;" id="infoUpgradeBtn">Upgrade</button>
+    <button class="action-btn secondary" id="infoEmployeeBtn">Hire Worker</button>
+  </div>
+</div>
+
+<!-- ─── WELCOME BACK POPUP ─── -->
+<div class="popup-overlay" id="welcomeBackPopup">
+  <div class="popup">
+    <h2>👋 Welcome Back, Boss!</h2>
+    <div class="subtitle">While you were away:</div>
+    <div id="welcomeBackEarnings"></div>
+    <div class="earnings-total">
+      <span>Total Offline Earnings</span>
+      <span id="welcomeBackTotal">₹0</span>
+    </div>
+    <div style="text-align:center;color:#888;font-size:0.8em;margin-top:8px;" id="welcomeBackTime">0m</div>
+    <button class="action-btn primary" style="margin-top:16px;" id="collectOfflineBtn" onclick="Game.hideAllPanels()">Collect</button>
+  </div>
+</div>
+
+<!-- Scripts - Three.js bundled locally -->
+<script src="lib/three.min.js"></script>
+<!-- Game systems (order matters) -->
+<script src="js/config/businesses.js"></script>
+<script src="js/config/progression.js"></script>
+<script src="js/data/missions.js"></script>
+<script src="js/systems/Economy.js"></script>
+<script src="js/systems/Save.js"></script>
+<script src="js/systems/Audio.js"></script>
+<script src="js/systems/DayNight.js"></script>
+<script src="js/systems/Particles.js"></script>
+<script src="js/systems/Building.js"></script>
+<script src="js/systems/NPC.js"></script>
+<script src="js/systems/Camera.js"></script>
+<script src="js/systems/Traffic.js"></script>
+<script src="js/systems/Missions.js"></script>
+<script src="js/systems/Progression.js"></script>
+<script src="js/scene/CityBuilder.js"></script>
+<script src="js/scene/IndianAssets.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+  // Boot when DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', Game.boot);
+  } else {
+    Game.boot();
+  }
+</script>
+
+</body>
+</html>
