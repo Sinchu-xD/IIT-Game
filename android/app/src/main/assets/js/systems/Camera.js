@@ -1,5 +1,5 @@
 // Camera system - touch and mouse pan/zoom with synchronized lookAt boundaries
-export class CameraController {
+class CameraController {
   constructor(camera, domElement, bounds) {
     this.camera = camera;
     this.domElement = domElement;

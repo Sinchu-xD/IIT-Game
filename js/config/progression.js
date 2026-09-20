@@ -1,7 +1,7 @@
 // Deep Gameplay Systems: Specializations, Demand, Roles, Zones, Synergies, Achievements, Objectives
 // Modular, offline-first, deterministic
 
-export const SPECIALIZATIONS = {
+const SPECIALIZATIONS = {
   chai_stall: [
     { id: 'tea_quality', name: 'Tea Quality', desc: '+25% Income multiplier', incomeMult: 1.25, demandMod: 5, tapMod: 1.1 },
     { id: 'fast_service', name: 'Fast Service', desc: '+30% Service speed & +1 Customer capacity', incomeMult: 1.10, speedMult: 1.3, capBonus: 1 },
@@ -29,7 +29,7 @@ export const SPECIALIZATIONS = {
   ]
 };
 
-export const EMPLOYEE_ROLES = {
+const EMPLOYEE_ROLES = {
   cashier: { id: 'cashier', name: 'Cashier', desc: '+5% Income & fast checkout', incomeBonus: 0.05, speedBonus: 0.1 },
   cook: { id: 'cook', name: 'Cook', desc: '+8% Income & +5 Demand', incomeBonus: 0.08, demandBonus: 5 },
   helper: { id: 'helper', name: 'Helper', desc: '+1 Customer capacity', capBonus: 1, speedBonus: 0.05 },
@@ -38,7 +38,7 @@ export const EMPLOYEE_ROLES = {
   technician: { id: 'technician', name: 'Technician', desc: '+10% Income', incomeBonus: 0.10 }
 };
 
-export const BUSINESS_ROLE_PREFERENCES = {
+const BUSINESS_ROLE_PREFERENCES = {
   chai_stall: ['cook', 'helper'],
   kirana_store: ['cashier', 'salesperson', 'helper'],
   dhaba: ['cook', 'helper', 'cashier'],
@@ -46,21 +46,21 @@ export const BUSINESS_ROLE_PREFERENCES = {
   mobile_shop: ['technician', 'salesperson', 'cashier']
 };
 
-export const CITY_ZONES = [
+const CITY_ZONES = [
   { id: 'zone_street', name: 'Small Street', plots: [0, 1, 2, 3, 4], desc: '+5% Tap bonus', bonusType: 'tap', bonusValue: 0.05 },
   { id: 'zone_market', name: 'Market Zone', plots: [5, 6, 7, 8], desc: '+5% Customer demand', bonusType: 'demand', bonusValue: 5 },
   { id: 'zone_neighborhood', name: 'Neighborhood', plots: [9, 10, 11], desc: '+5% Passive income', bonusType: 'income', bonusValue: 0.05 },
   { id: 'zone_city_center', name: 'City Center', plots: [12, 13, 14], desc: '+1 Customer capacity', bonusType: 'capacity', bonusValue: 1 }
 ];
 
-export const SYNERGIES = [
+const SYNERGIES = [
   { id: 'food_street', name: 'Food Street', reqs: ['chai_stall', 'dhaba'], bonusDesc: '+6% Food income & +5 Demand', incomeBonus: 0.06, demandBonus: 5, target: ['chai_stall', 'dhaba'] },
   { id: 'market_hub', name: 'Market Hub', reqs: ['kirana_store', 'mobile_shop'], bonusDesc: '+5% Retail income', incomeBonus: 0.05, demandBonus: 5, target: ['kirana_store', 'mobile_shop'] },
   { id: 'main_street', name: 'Main Street Commercial', reqs: ['salon', 'mobile_shop'], bonusDesc: '+5% Commercial income & +5% Tap bonus', incomeBonus: 0.05, tapBonus: 0.05, target: ['salon', 'mobile_shop'] },
   { id: 'thriving_bazaar', name: 'Thriving Bazaar', reqs: ['chai_stall', 'kirana_store', 'dhaba', 'salon', 'mobile_shop'], bonusDesc: '+8% All businesses income', incomeBonus: 0.08, target: 'all' }
 ];
 
-export const ACHIEVEMENTS = [
+const ACHIEVEMENTS = [
   { id: 'first_business', title: 'First Business', desc: 'Build your first business', target: 1, type: 'build', reward: 300 },
   { id: 'earn_1k', title: 'First ₹1,000', desc: 'Earn ₹1,000 total', target: 1000, type: 'earn', reward: 500 },
   { id: 'earn_100k', title: '₹100K Milestone', desc: 'Earn ₹100,000 total', target: 100000, type: 'earn', reward: 15000 },
@@ -84,7 +84,7 @@ export const ACHIEVEMENTS = [
   { id: 'player_level_25', title: 'Urban Legend', desc: 'Reach Player Level 25', target: 25, type: 'player_level', reward: 150000 }
 ];
 
-export const CITY_OBJECTIVE_TEMPLATES = [
+const CITY_OBJECTIVE_TEMPLATES = [
   { id: 'earn_today', title: 'Daily Profits', desc: 'Earn ₹', type: 'earn_delta', baseAmount: 2500, rewardCash: 800, rewardXP: 40 },
   { id: 'serve_customers', title: 'Customer Rush', desc: 'Serve customers', type: 'customers_delta', baseAmount: 10, rewardCash: 1200, rewardXP: 50 },
   { id: 'tap_stores', title: 'On-Site Inspection', desc: 'Tap businesses', type: 'taps_delta', baseAmount: 8, rewardCash: 1000, rewardXP: 40 },

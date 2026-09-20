@@ -1,5 +1,5 @@
 // CityBuilder - Procedural Indian neighborhood scene
-export class CityBuilder {
+class CityBuilder {
   constructor(scene) {
     this.scene = scene;
     this.materials = {};

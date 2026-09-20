@@ -1,5 +1,5 @@
 // Business configurations - data-driven (mirrors ScriptableObject pattern for Unity port)
-export const BUSINESSES = {
+const BUSINESSES = {
   chai_stall: {
     id: 'chai_stall',
     name: 'Chai Stall',
@@ -117,19 +117,19 @@ export const BUSINESSES = {
   }
 };
 
-export const BUSINESS_ORDER = ['chai_stall', 'kirana_store', 'dhaba', 'salon', 'mobile_shop'];
+const BUSINESS_ORDER = ['chai_stall', 'kirana_store', 'dhaba', 'salon', 'mobile_shop'];
 
-export function getBusinessConfig(id) {
+function getBusinessConfig(id) {
   return BUSINESSES[id] || null;
 }
 
-export function getUpgradeCost(businessId, currentLevel) {
+function getUpgradeCost(businessId, currentLevel) {
   const cfg = BUSINESSES[businessId];
   if (!cfg || currentLevel >= cfg.maxLevel) return Infinity;
   return Math.floor(cfg.upgradeBaseCost * Math.pow(cfg.upgradeCostMultiplier, currentLevel));
 }
 
-export function getIncomeForLevel(businessId, level, employeeCount = 0) {
+function getIncomeForLevel(businessId, level, employeeCount = 0) {
   const cfg = BUSINESSES[businessId];
   if (!cfg) return 0;
   const base = cfg.baseIncome * Math.pow(1.35, level - 1);
@@ -137,11 +137,11 @@ export function getIncomeForLevel(businessId, level, employeeCount = 0) {
   return Math.floor(base * empBonus);
 }
 
-export function getBuildCost(businessId) {
+function getBuildCost(businessId) {
   return BUSINESSES[businessId]?.baseCost || Infinity;
 }
 
-export const PLOT_UNLOCK_COSTS = [
+const PLOT_UNLOCK_COSTS = [
   0,        // Plot 0: Starting plot (free)
   2000,     // Plot 1: ₹2,000
   8000,     // Plot 2: ₹8,000

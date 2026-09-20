@@ -1,5 +1,5 @@
 // IndianAssets - Procedural assets for authentic Indian street shops
-export class IndianAssets {
+class IndianAssets {
   constructor(scene) {
     this.scene = scene;
     this.materials = this.initMaterials();

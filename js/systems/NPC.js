@@ -1,5 +1,5 @@
 // NPC system - object pooling, customers, pedestrians, workers
-export class NPCSystem {
+class NPCSystem {
   constructor(scene, gameState) {
     this.scene = scene;
     this.gs = gameState;

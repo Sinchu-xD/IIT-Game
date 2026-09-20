@@ -1,5 +1,5 @@
 // Missions system - tracking, completion, rewards
-export class MissionSystem {
+class MissionSystem {
   constructor(economy, gameState) {
     this.economy = economy;
     this.gs = gameState;

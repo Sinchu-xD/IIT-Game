@@ -1,5 +1,5 @@
 // Building system - plots, construction, upgrades, visual states
-export class BuildingSystem {
+class BuildingSystem {
   constructor(scene, economy, gameState) {
     this.scene = scene;
     this.economy = economy;

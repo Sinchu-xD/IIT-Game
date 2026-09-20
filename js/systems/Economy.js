@@ -1,6 +1,6 @@
 // Economy system - Central authority for all currency modifications
 // Uses safe floating-point math, no int overflow
-export class EconomyManager {
+class EconomyManager {
   constructor() {
     this.cash = 0;
     this.totalEarned = 0;

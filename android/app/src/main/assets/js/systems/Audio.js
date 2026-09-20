@@ -1,5 +1,5 @@
 // Audio system - Web Audio API, ambient sounds, UI feedback
-export class AudioSystem {
+class AudioSystem {
   constructor() {
     this.ctx = null;
     this.enabled = true;

@@ -1141,3 +1141,6 @@ const Game = (function () {
     checkBusinessUnlocks
   };
 })();
+
+if (typeof window !== 'undefined') window.Game = Game;
+if (typeof globalThis !== 'undefined') globalThis.Game = Game;

@@ -1,5 +1,5 @@
 // Day/Night cycle - lightweight 4-phase system
-export class DayNightCycle {
+class DayNightCycle {
   constructor(scene) {
     this.scene = scene;
     this.timeOfDay = 0.25; // 0-1, starts at morning

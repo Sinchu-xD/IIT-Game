@@ -88,9 +88,9 @@ const modules = [
 
 for (const rel of modules) {
   let code = fs.readFileSync(BASE + rel, 'utf8');
-  code = code.replace(/^export\s+class\s+(\w+)/gm, 'globalThis.$1 = class $1');
-  code = code.replace(/^export\s+function\s+(\w+)/gm, 'globalThis.$1 = function $1');
-  code = code.replace(/^export\s+(?:const|let|var)\s+(\w+)\s*=/gm, 'globalThis.$1 =');
+  code = code.replace(/^(?:export\s+)?class\s+(\w+)/gm, 'globalThis.$1 = class $1');
+  code = code.replace(/^(?:export\s+)?function\s+(\w+)/gm, 'globalThis.$1 = function $1');
+  code = code.replace(/^(?:export\s+)?(?:const|let|var)\s+(\w+)\s*=/gm, 'globalThis.$1 =');
   code = code.replace(/^export\s+\{[\s\w,]*\}\s*;?\s*$/gm, '');
   vm.runInThisContext(code);
 }

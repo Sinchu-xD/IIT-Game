@@ -1,5 +1,5 @@
 // Save/Load system with versioned format, corruption recovery, offline earnings
-export class SaveSystem {
+class SaveSystem {
   constructor() {
     this.SAVE_KEY = 'indian_idle_tycoon_save';
     this.SAVE_VERSION = 1;

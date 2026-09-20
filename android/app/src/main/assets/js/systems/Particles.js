@@ -1,5 +1,5 @@
 // Particle system - floating income text, effects
-export class ParticleSystem {
+class ParticleSystem {
   constructor(scene) {
     this.scene = scene;
     this.particles = [];

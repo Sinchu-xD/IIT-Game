@@ -1,7 +1,7 @@
 // Deep Gameplay Progression Manager
 // Handles Specializations, Customer Demand, Employee Roles, Zones, Synergies, Achievements, Objectives, and Daily 7-Day Cycle
 
-export class ProgressionSystem {
+class ProgressionSystem {
   constructor(economy, gameState) {
     this.economy = economy;
     this.gs = gameState;

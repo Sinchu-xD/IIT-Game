@@ -1,5 +1,5 @@
 // Traffic system - procedural animated Indian traffic (Auto-rickshaws and Scooters)
-export class TrafficSystem {
+class TrafficSystem {
   constructor(scene) {
     this.scene = scene;
     this.vehicles = [];

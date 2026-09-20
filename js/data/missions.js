@@ -1,5 +1,5 @@
 // Mission definitions
-export const MISSIONS = [
+const MISSIONS = [
   {
     id: 'build_first_chai',
     title: 'Start Your Journey',
@@ -287,7 +287,7 @@ export const MISSIONS = [
   }
 ];
 
-export const DAILY_REWARDS = [
+const DAILY_REWARDS = [
   { day: 1, reward: { cash: 500 }, label: 'Day 1 Bonus' },
   { day: 2, reward: { cash: 1000 }, label: 'Day 2 Bonus' },
   { day: 3, reward: { cash: 2000 }, label: 'Day 3 Bonus' },
